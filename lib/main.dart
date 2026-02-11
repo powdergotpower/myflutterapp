@@ -1,121 +1,237 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ValentineApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class ValentineApp extends StatelessWidget {
+  const ValentineApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      debugShowCheckedModeBanner: false,
+      home: const ValentineHome(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class ValentineHome extends StatefulWidget {
+  const ValentineHome({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<ValentineHome> createState() => _ValentineHomeState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _ValentineHomeState extends State<ValentineHome>
+    with TickerProviderStateMixin {
+  late AnimationController _textController;
+  late Animation<double> _fadeAnimation;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+
+    _textController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2));
+
+    _fadeAnimation =
+        CurvedAnimation(parent: _textController, curve: Curves.easeIn);
+
+    _textController.forward();
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
+
+  void _showLetter() {
+    showDialog(
+      context: context,
+      builder: (_) => const LoveLetterDialog(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+      backgroundColor: const Color(0xFFFFE6EA),
+      body: Stack(
+        children: [
+          // Background grid
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFFFFE6EA), Color(0xFFFFD1DC)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
             ),
+          ),
+
+          // Floating hearts
+          const Positioned(
+              top: 80, left: 40, child: Icon(Icons.favorite, color: Colors.pink, size: 30)),
+          const Positioned(
+              bottom: 120, right: 60, child: Icon(Icons.favorite, color: Colors.red, size: 40)),
+
+          // Main Content
+          Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // LEFT SIDE
+                Expanded(
+                  flex: 4,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: const Text(
+                          "Happy",
+                          style: TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              shadows: [
+                                Shadow(
+                                    color: Colors.black,
+                                    offset: Offset(2, 2),
+                                    blurRadius: 3)
+                              ]),
+                        ),
+                      ),
+                      FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: const Text(
+                          "Valentine’s Day",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.pink,
+                              shadows: [
+                                Shadow(
+                                    color: Colors.black,
+                                    offset: Offset(2, 2),
+                                    blurRadius: 3)
+                              ]),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.pink,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 25, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50)),
+                        ),
+                        onPressed: _showLetter,
+                        icon: const Icon(Icons.mail),
+                        label: const Text("Open My Heart"),
+                      )
+                    ],
+                  ),
+                ),
+
+                // RIGHT SIDE
+                Expanded(
+                  flex: 6,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 250,
+                        height: 250,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.black, width: 5),
+                          image: const DecorationImage(
+                            image: AssetImage("assets/love.jpg"),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 8),
+                        decoration: BoxDecoration(
+                            color: Colors.pink,
+                            borderRadius: BorderRadius.circular(30),
+                            border:
+                                Border.all(color: Colors.black, width: 2)),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.favorite, color: Colors.white),
+                            SizedBox(width: 10),
+                            Text(
+                              "My Valentine",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(width: 10),
+                            Icon(Icons.favorite, color: Colors.white),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class LoveLetterDialog extends StatelessWidget {
+  const LoveLetterDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20)),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color(0xFFFFF0F5)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Text(
+              "To My Love 💕",
+              style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.pink),
+            ),
+            SizedBox(height: 20),
+            Text(
+              "You are the most beautiful part of my life. "
+              "Every moment with you feels magical. "
+              "On this Valentine’s Day, I just want you to know "
+              "how deeply I love you. ❤️",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 20),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
