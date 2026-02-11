@@ -25,7 +25,5 @@ flutter:
     - assets/images/heart.png
     - assets/images/rose.png
     - assets/images/giftbox.png
-    - assets/images/firework.png
-    - assets/images/profile.jpg
-    - assets/audio/love.mp3
+    - assets/images/love.jpg
     # Add more images as needed, e.g., cute1.png, etc.
