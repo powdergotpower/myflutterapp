@@ -12,7 +12,8 @@ dependencies:
     sdk: flutter
   audioplayers: ^5.2.1  # For playing background music
   flutter_animate: ^4.5.0  # For animations (hearts floating, fireworks)
-
+  confetti: ^0.8.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
