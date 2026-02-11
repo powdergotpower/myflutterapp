@@ -133,7 +133,7 @@ class _FirstScreenState extends State<FirstScreen> {
                       ),
                       child: ClipOval(
                         child: Image.asset(
-                          'assets/images/her_photo.jpg', // ← put her photo here
+                          'assets/images/love.jpg', // ← put her photo here
                           fit: BoxFit.cover,
                         ),
                       ),
