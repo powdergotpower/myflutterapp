@@ -178,7 +178,11 @@ class _FirstScreenState extends State<FirstScreen> {
                           "Continue →",
                           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                         ),
-                      ).animate().fadeIn(delay: 1800.ms).scale(begin: 0.8, end: 1.0, duration: 800.ms),
+                      ).animate().fadeIn(delay: 1800.ms).scale(
+                        begin: const Offset(0.8, 0.8),  // 80% scale on both X and Y
+                        end: const Offset(1.0, 1.0),    // back to 100%
+                        duration: const Duration(milliseconds: 800),
+                      ),
                     ),
                   ],
                 ),
