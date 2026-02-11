@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -10,9 +10,9 @@ class ValentineApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const ValentineHome(),
+      home: ValentineHome(),
     );
   }
 }
@@ -27,7 +27,11 @@ class ValentineHome extends StatefulWidget {
 class _ValentineHomeState extends State<ValentineHome>
     with TickerProviderStateMixin {
   late AnimationController _textController;
+  late AnimationController _heartController;
+  late AnimationController _glowController;
+
   late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
@@ -36,8 +40,22 @@ class _ValentineHomeState extends State<ValentineHome>
     _textController =
         AnimationController(vsync: this, duration: const Duration(seconds: 2));
 
+    _heartController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 6))
+          ..repeat();
+
+    _glowController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2))
+          ..repeat(reverse: true);
+
     _fadeAnimation =
         CurvedAnimation(parent: _textController, curve: Curves.easeIn);
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(-0.3, 0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+        parent: _textController, curve: Curves.easeOutCubic));
 
     _textController.forward();
   }
@@ -45,45 +63,43 @@ class _ValentineHomeState extends State<ValentineHome>
   @override
   void dispose() {
     _textController.dispose();
+    _heartController.dispose();
+    _glowController.dispose();
     super.dispose();
   }
 
   void _showLetter() {
-    showDialog(
-      context: context,
-      builder: (_) => const LoveLetterDialog(),
-    );
+    showDialog(context: context, builder: (_) => const LoveLetterDialog());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFE6EA),
       body: Stack(
         children: [
-          // Background grid
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFFFFE6EA), Color(0xFFFFD1DC)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
+          // Gradient Background
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFFFE3EC), Color(0xFFFFC1D6)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
           ),
 
-          // Floating hearts
-          const Positioned(
-              top: 80, left: 40, child: Icon(Icons.favorite, color: Colors.pink, size: 30)),
-          const Positioned(
-              bottom: 120, right: 60, child: Icon(Icons.favorite, color: Colors.red, size: 40)),
+          // Floating Hearts
+          ...List.generate(
+            15,
+            (index) => _FloatingHeart(
+              controller: _heartController,
+              delay: index * 0.15,
+            ),
+          ),
 
           // Main Content
           Center(
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // LEFT SIDE
                 Expanded(
@@ -93,49 +109,44 @@ class _ValentineHomeState extends State<ValentineHome>
                     children: [
                       FadeTransition(
                         opacity: _fadeAnimation,
-                        child: const Text(
-                          "Happy",
-                          style: TextStyle(
-                              fontSize: 48,
+                        child: SlideTransition(
+                          position: _slideAnimation,
+                          child: const Text(
+                            "Happy",
+                            style: TextStyle(
+                              fontSize: 52,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               shadows: [
                                 Shadow(
-                                    color: Colors.black,
-                                    offset: Offset(2, 2),
-                                    blurRadius: 3)
-                              ]),
+                                    color: Colors.pinkAccent,
+                                    blurRadius: 20,
+                                    offset: Offset(0, 6))
+                              ],
+                            ),
+                          ),
                         ),
                       ),
+                      const SizedBox(height: 10),
                       FadeTransition(
                         opacity: _fadeAnimation,
                         child: const Text(
                           "Valentine’s Day",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: 40,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.pink,
-                              shadows: [
-                                Shadow(
-                                    color: Colors.black,
-                                    offset: Offset(2, 2),
-                                    blurRadius: 3)
-                              ]),
+                            fontSize: 40,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFE91E63),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 40),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.pink,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 25, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50)),
-                        ),
-                        onPressed: _showLetter,
-                        icon: const Icon(Icons.mail),
-                        label: const Text("Open My Heart"),
+
+                      // Gradient Button
+                      _GradientButton(
+                        text: "Open My Heart",
+                        icon: Icons.mail,
+                        onTap: _showLetter,
                       )
                     ],
                   ),
@@ -147,51 +158,199 @@ class _ValentineHomeState extends State<ValentineHome>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        width: 250,
-                        height: 250,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.black, width: 5),
-                          image: const DecorationImage(
-                            image: AssetImage("assets/love.jpg"),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 8),
-                        decoration: BoxDecoration(
-                            color: Colors.pink,
-                            borderRadius: BorderRadius.circular(30),
-                            border:
-                                Border.all(color: Colors.black, width: 2)),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.favorite, color: Colors.white),
-                            SizedBox(width: 10),
-                            Text(
-                              "My Valentine",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold),
+                      AnimatedBuilder(
+                        animation: _glowController,
+                        builder: (context, child) {
+                          return Container(
+                            width: 260,
+                            height: 260,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Colors.pinkAccent,
+                                  Colors.white,
+                                  Colors.pink
+                                ],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.pinkAccent.withOpacity(
+                                      0.6 * _glowController.value),
+                                  blurRadius: 40,
+                                  spreadRadius: 8,
+                                )
+                              ],
                             ),
-                            SizedBox(width: 10),
-                            Icon(Icons.favorite, color: Colors.white),
-                          ],
-                        ),
-                      )
+                            child: Container(
+                              margin: const EdgeInsets.all(8),
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image:
+                                      AssetImage("assets/love.jpg"),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 30),
+
+                      const _ValentineTag(),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           )
         ],
+      ),
+    );
+  }
+}
+
+// Floating Hearts
+class _FloatingHeart extends StatelessWidget {
+  final AnimationController controller;
+  final double delay;
+
+  const _FloatingHeart(
+      {required this.controller, required this.delay});
+
+  @override
+  Widget build(BuildContext context) {
+    final random = Random();
+    final size = random.nextDouble() * 25 + 15;
+    final left = random.nextDouble() *
+        MediaQuery.of(context).size.width;
+
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        double progress = (controller.value + delay) % 1;
+        return Positioned(
+          bottom:
+              progress * MediaQuery.of(context).size.height,
+          left: left,
+          child: Opacity(
+            opacity: 1 - progress,
+            child: Icon(
+              Icons.favorite,
+              color: Colors.pinkAccent.withOpacity(0.8),
+              size: size,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// Gradient Button
+class _GradientButton extends StatelessWidget {
+  final String text;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _GradientButton(
+      {required this.text,
+      required this.icon,
+      required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 60,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(40),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFF5C8D), Color(0xFFE91E63)],
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.pinkAccent,
+            blurRadius: 15,
+            offset: Offset(0, 8),
+          )
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(40),
+          onTap: onTap,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.mail, color: Colors.white),
+              const SizedBox(width: 10),
+              Text(
+                text,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Valentine Tag
+class _ValentineTag extends StatefulWidget {
+  const _ValentineTag();
+
+  @override
+  State<_ValentineTag> createState() => _ValentineTagState();
+}
+
+class _ValentineTagState extends State<_ValentineTag>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _pulse;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulse =
+        AnimationController(vsync: this, duration: const Duration(seconds: 1))
+          ..repeat(reverse: true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: Tween(begin: 1.0, end: 1.08).animate(_pulse),
+      child: Container(
+        padding:
+            const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFF5C8D), Color(0xFFE91E63)],
+          ),
+          borderRadius: BorderRadius.circular(40),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.favorite, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              "My Valentine",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold),
+            ),
+            SizedBox(width: 10),
+            Icon(Icons.favorite, color: Colors.white),
+          ],
+        ),
       ),
     );
   }
@@ -203,16 +362,19 @@ class LoveLetterDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20)),
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(25),
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: const Color(0xFFFFF0F5)),
-        child: Column(
+          borderRadius: BorderRadius.circular(25),
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFFF0F5), Color(0xFFFFE3EC)],
+          ),
+        ),
+        child: const Column(
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Text(
               "To My Love 💕",
               style: TextStyle(
@@ -225,11 +387,10 @@ class LoveLetterDialog extends StatelessWidget {
               "You are the most beautiful part of my life. "
               "Every moment with you feels magical. "
               "On this Valentine’s Day, I just want you to know "
-              "how deeply I love you. ❤️",
+              "how deeply I love you.",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16),
             ),
-            SizedBox(height: 20),
           ],
         ),
       ),
