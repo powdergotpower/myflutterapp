@@ -1,8 +1,15 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'first_screen.dart';  // ← import your file
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'auth/login_page.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://yvnjzzwmiwjepmwmfvca.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2bmp6endtaXdqZXBtd21mdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjEzOTIsImV4cCI6MjA4NjE5NzM5Mn0.wW5hbLSiWFjCWXoaqQ8-ee54-fGI11NTfS_ldu6YylM',
+  );
+
   runApp(const MyApp());
 }
 
@@ -11,14 +18,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Valentine's Day Surprise",
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.pink,
-        scaffoldBackgroundColor: Colors.pink[50],
-      ),
-      home: const FirstScreen(),  // ← start with your beautiful screen
+      home: LoginPage(),
     );
   }
 }
