@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+    supabase_flutter: ^2.3.4
   audioplayers: ^5.2.1  # For playing background music
   flutter_animate: ^4.5.2   # latest as of now
   confetti: ^0.8.0
