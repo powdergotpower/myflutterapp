@@ -1,20 +1,23 @@
-name: valentines_app
-description: A Valentine's Day greeting app.
+name: bubble_pop_game
+description: A 2D bubble popping game with leaderboard and authentication.
 
 publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-    supabase_flutter: ^2.3.4
-  audioplayers: ^5.2.1  # For playing background music
-  flutter_animate: ^4.5.2   # latest as of now
+
+  cupertino_icons: ^1.0.2
+  supabase_flutter: ^2.3.4
+  flame: ^1.15.0
+  audioplayers: ^5.2.1
+  flutter_animate: ^4.5.2
   confetti: ^0.8.0
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -23,8 +26,4 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/heart.png
-    - assets/images/rose.png
-    - assets/images/giftbox.png
-    - assets/images/love.jpg
-    # Add more images as needed, e.g., cute1.png, etc.
+    - assets/images/
